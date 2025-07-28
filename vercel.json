@@ -2,17 +2,13 @@
   "builds": [
     {
       "src": "app.py",
-      "use": "@vercel/python",
-      "config": {
-        "runtime": "python3.9",
-        "entrypoint": "gunicorn -c gunicorn.conf.py app:app"
-      }
+      "use": "@vercel/python"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/app.py"
+      "src": "/(.*)",
+      "dest": "app.py"
     }
   ]
 }
