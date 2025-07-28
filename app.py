@@ -1,25 +1,28 @@
-from quart import Quart, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template
 from smartbindb import SmartBinDB
 
-# Quart অ্যাপ তৈরি
-app = Quart(__name__)
+# Flask অ্যাপ তৈরি
+app = Flask(__name__)
 
 # SmartBinDB ক্লাস ইন্সট্যান্স তৈরি
 smartdb = SmartBinDB()
 
 # ইনডেক্স পেইজ (Documentation) এর জন্য রুট
 @app.route("/", methods=["GET"])
-async def index():
-    return await render_template("index.html")
+def index():
+    return render_template("index.html")
 
 # BIN তথ্য অনুসন্ধান API Endpoint
 @app.route("/api/bin", methods=["GET"])
-async def get_bin_info():
+def get_bin_info():
     bin_number = request.args.get("bin")
     if not bin_number:
         return jsonify({"error": "bin parameter is required"}), 400
 
-    result = await smartdb.get_bin_info(bin_number)
+    # smartbindb is async, but we can call it from a sync function
+    # by creating a new event loop. This is not ideal, but will work.
+    import asyncio
+    result = asyncio.run(smartdb.get_bin_info(bin_number))
 
     if result.get("status") != "SUCCESS":
         return jsonify({"error": "BIN not found"}), 404
@@ -28,7 +31,7 @@ async def get_bin_info():
 
 # কান্ট্রি ভিত্তিক BIN অনুসন্ধান API Endpoint (রিসোর্স লিমিট দিয়ে)
 @app.route("/api/country", methods=["GET"])
-async def get_bins_by_country():
+def get_bins_by_country():
     if request.args.get("list"):
         # Hardcoded country list as a temporary fix
         countries = [
@@ -48,7 +51,8 @@ async def get_bins_by_country():
 
     limit = request.args.get("limit", 10, type=int)
 
-    result = await smartdb.get_bins_by_country(country_code, limit)
+    import asyncio
+    result = asyncio.run(smartdb.get_bins_by_country(country_code, limit))
 
     if result.get("status") != "SUCCESS":
         return jsonify({"error": "No BINs found for the country"}), 404
@@ -64,6 +68,6 @@ async def get_bins_by_country():
     return jsonify(response_data)
 
 # This block is for local development only and should not be part of the Vercel deployment.
-# Vercel uses its own server to run the Quart app.
+# Vercel uses its own server to run the Flask app.
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
