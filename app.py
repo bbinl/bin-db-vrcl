@@ -63,7 +63,5 @@ async def get_bins_by_country():
     }
     return jsonify(response_data)
 
-# This block is for local development only and should not be part of the Vercel deployment.
-# Vercel uses its own server to run the Quart app.
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+# The __main__ block is removed to ensure it does not interfere with Vercel's runtime.
+# To run locally, you can use the command: `quart run`
