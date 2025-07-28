@@ -5,7 +5,7 @@
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.9",
-        "wsgi": "gunicorn.app.base.Application"
+        "entrypoint": "gunicorn -c gunicorn.conf.py app:app"
       }
     }
   ],
