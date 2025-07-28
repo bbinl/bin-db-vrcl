@@ -63,8 +63,7 @@ async def get_bins_by_country():
     }
     return jsonify(response_data)
 
-# Flask অ্যাপ রান করার জন্য
+# This block is for local development only and should not be part of the Vercel deployment.
+# Vercel uses its own server to run the Quart app.
 if __name__ == "__main__":
-    # পোর্ট সেট করে Flask অ্যাপ রান করা
-    port = 5000
-    app.run(debug=True, host="0.0.0.0", port=port)
+    app.run(debug=True, host="0.0.0.0", port=5000)
